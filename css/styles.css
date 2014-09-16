@@ -1,0 +1,107 @@
+html, body {
+	width: 600px;
+	height: 500px;
+	font-family: sans-serif;
+}
+
+#main_container {
+}
+	.avatar_small {
+		height: 50px;
+		width: 50px;
+		background-size: cover;
+	}
+	#top_panel {
+		width: 100%;
+		height: 50px;
+	}
+		#picked {
+			float: left;
+			width: 280px;
+			height: 50px;
+			padding: 10px;
+			background-color: #F1F1F1;
+		}
+		#picked:hover {
+			cursor: pointer;
+			background-color: #E1E1E1;
+		}
+		#picked div {
+			float: left;
+			font-weight: bold;
+		}
+			#picked_person {
+				width: 100%;
+			}
+
+		#friend_list {
+			position: fixed;
+			width: 280px;
+			height: 400px;
+			margin-top: 20px;
+			padding: 0 10px 0 10px;
+			overflow-y: scroll;
+			background-color: #F1F1F1;
+		}	
+			.person {
+				width: 100%;
+				height: 50px;
+				padding: 5px 0 5px 0;
+			}
+			.person:hover {
+				cursor: pointer;
+				background-color: #E1E1E1;
+			}
+				.person div {
+					float: left;
+				}
+				.person_name {
+					width: 180px;
+					padding: 15px 0 0 15px;
+					white-space: nowrap; /* Запрещаем перенос строк */
+    				overflow: hidden; /* Обрезаем все, что не помещается в область */
+    			}
+
+    	#controller {
+    		float: left;
+    		width: 180px;
+    		height: 35px;
+    	}
+    		.control {
+    			height: 100%;
+    			float: left;
+    		}
+    		.arrow {
+    			width: 40px;
+    			background-color: #F1F1F1;
+    		}
+    		.arrow:hover {
+    			cursor: pointer;
+    			background-color: #E1E1E1;
+    		}
+    		#count_av {
+    			width: 100px;
+    			margin-top: 10px;
+    			text-align: center;
+    			font-weight: bold;
+    		}
+
+    	#orientation_switcher {
+    		float: left;
+    		width: 120px;
+    		height: 50px;
+    	}
+    		.or_sw {
+    			float: left;
+    			width: 50%;
+    			height: 100%;
+    			background-color: #F1F1F1;
+    		}
+    		.or_sw:hover {
+    			cursor: pointer;
+    			background-color: #E1E1E1;
+    		}
+    
+    .clear_both {
+    	clear: both;
+    }
