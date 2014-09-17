@@ -15,14 +15,28 @@
 			<div id="top_panel">
 				<div id="picked">
 				</div>
-				<div id="controller">
-					<div class='control arrow' id="prev_av"></div>
-					<div class='control' id="count_av"></div>
-					<div class='control arrow' id="next_av"></div>
+
+				<div id='photo_panel'>
+					<div id="selector_div">
+						<select id="album_selector">
+						</select>
+					</div>
+					<div id="controller">
+						<div class='control arrow' id="prev_av"></div>
+						<div class='control' id="count_av"></div>
+						<div class='control arrow' id="next_av"></div>
+					</div>
 				</div>
-				<div id='orientation_switcher'>
-					<div class='or_sw' id="or_left">left</div>
-					<div class='or_sw' id="or_right">right</div>
+
+				<div id="reflect_control">
+					<div id='orientation_switcher'>
+						<div class='ref_meth' id="ref_center">center</div>
+						<div class='ref_meth' id="ref_custom">custom</div>
+
+						<div class='or_sw' id="or_original">original</div>
+						<div class='or_sw' id="or_left">left</div>
+						<div class='or_sw' id="or_right">right</div>
+					</div>
 				</div>
 			</div>
 			<div id="friend_list">
@@ -31,7 +45,8 @@
 			<div class="clear_both"></div>
 			
 			<div id="canvas_div">
-				<canvas id='canvas' width="500" height="500"></canvas>
+				<canvas class='canvas' id='canvas' width="500" height="500"></canvas>
+				<canvas class='canvas' id='axis' width="500" height="500"></canvas>
 			</div>
 
 		</div>

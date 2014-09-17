@@ -20,7 +20,6 @@ $(document).ready(function() {
 		getFriendsInfo: function(data) {
 			this.friends = data['response'];
 			$.each(this.friends, function(i, val) {
-				//postRequest('photos.get', {owner_id: val['uid'], album_id: 'profile'}, friends1.showFriendList, val);
 				persons[val['uid']] = new Person(val);
 			});
 
@@ -34,155 +33,33 @@ $(document).ready(function() {
 		}
 	}
 
-	function Person(friend) {
-		this.uid = friend.uid;
-		this.first_name = friend.first_name;
-		this.last_name = friend.last_name;
-		this.avatar = friend.photo_50;
-		this.album_profile = [];
-	}
-
-	Person.prototype.addToList = function() {
-		$("#friend_list").append("<div class='person' id='" + this.uid + "'><div class='avatar_small'></div><div class='person_name'>" + this.first_name + " " + this.last_name + "</div></div>");
-		$("#" + this.uid).children('.avatar_small').css("backgroundImage", "url(" + this.avatar + ")");
-	}
-
-	Person.prototype.pick = function() {
-		canvas.person = this;
-		canvas.avatar_index = 0;
-		$("#picked").html("<div id='picked_person'><div class='avatar_small'></div><div class='person_name'>" + this.first_name + " " + this.last_name + "</div></div>");
-		$("#picked_person").children('.avatar_small').css("backgroundImage", "url(" + this.avatar + ")");
-		if(this.album_profile.length)
-			canvas.draw();
-		else
-			postRequest('photos.get', {owner_id: this.uid, album_id: 'profile'}, this.avatarList, this);
-	}
-
-	Person.prototype.avatarList = function(data) {
-		var new_image;
-		var album_array = [];
-		$.each(data['response'], function(i, val) {
-			album_array.unshift(val['src_big']);
-		});
-
-		$.ajax({
-			url: 'img_upload.php',
-			type: 'POST',
-			data: {'images': album_array},
-			success: this.loadImages,
-			error: function(data, textStatus, errorThrown) {
-				console.log(data);
-				console.log(textStatus);
-				console.log(errorThrown);
-			},
-			dataType: 'json',
-			context: this
-		});		
-	}
-
-	Person.prototype.loadImages = function(data) {
-		var album_array = this.album_profile;
-		$.each(data, function(i, val) {
-			new_image = new Image();
-			new_image.src = val;
-			album_array.push(new_image);
-		});
-		this.waitForImages();
-	}
-
-	Person.prototype.waitForImages = function() {
-		var that = this;
-	  	for(var i = 0; i < this.album_profile.length; i++) {
-	  		if(!this.album_profile[i].complete) {
-	  			setTimeout(function() { that.waitForImages(); }, 100);
-	  			return;
-	  		}
-	  		else {
-	  			if(this.album_profile[i].width > 500 || this.album_profile[i].height > 500) {
-	  				var k;
-	  				if(this.album_profile[i].width > this.album_profile[i].height) {
-	  					k = this.album_profile[i].width/500;
-		        		this.album_profile[i].width /= k;
-		        		this.album_profile[i].height /= k;       		
-		        	}
-			    	else {
-			    		k = this.album_profile[i].height/500;
-		        		this.album_profile[i].width /= k;
-		        		this.album_profile[i].height /= k;      		
-			    	}
-	  			}
-	  		}
-	  	}
-	  	this.clearTemp();
-	  	canvas.draw();
-	}
-
-	Person.prototype.clearTemp = function() {
-		var temp = [];
-		var array = this.album_profile;
-		
-		$.each(array, function(i, val) {
-			temp.push(val.src);
-		});
-
-		$.ajax({
-			url: 'clear_temp.php',
-			type: 'POST',
-			data: {'images': temp},
-			error: function(data, textStatus, errorThrown) {
-				console.log(data);
-				console.log(textStatus);
-				console.log(errorThrown);
-			}
-		});	
-	}
-
-	function Album() {
-		
-	}
-
-	function prevAvatar() {
-		if(canvas.avatar_index == 0) {
-			canvas.avatar_index = canvas.person.album_profile.length - 1;
-			canvas.draw();
-		}
-		else {
-			canvas.avatar_index--;
-			canvas.draw();
-		}
-	}
-
-	function nextAvatar() {
-		if(canvas.avatar_index == canvas.person.album_profile.length - 1) {
-			canvas.avatar_index = 0;
-			canvas.draw();
-		}
-		else {
-			canvas.avatar_index++;
-			canvas.draw();
-		}
-	}
-
 	var canvas = {
 		initialize: function() {
 	        this.canvas = document.getElementById("canvas");
 	        this.context = this.canvas.getContext("2d");
+
+	        this.axis_canvas = document.getElementById("axis");
+	        this.axis_context = this.axis_canvas.getContext("2d");
+	        this.album = [];
 	    },
 
 	    draw: function() {
 	    	var that = this;
-	    	var img = this.person.album_profile[this.avatar_index];
+	    	var img = this.album.photos[this.avatar_index];
+	    	
 	    	this.canvas.width = img.width;
 	    	this.canvas.height = img.height;
+	    	this.axis_canvas.width = this.canvas.width;
+	    	this.axis_canvas.height = this.canvas.height;
 
 	    	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	    	this.context.drawImage(img, 0, 0, img.width, img.height);
 
-	    	$("#count_av").text(that.avatar_index+1 + ' / ' + that.person.album_profile.length);
+	    	$("#count_av").text(that.avatar_index+1 + ' / ' + that.album.photos.length);
 	    },
 
 	    leftReflect: function() {
-	    	var img = this.person.album_profile[this.avatar_index];
+	    	var img = this.album.photos[this.avatar_index];
 
 	    	this.context.drawImage(img, 0, 0, img.width, img.height);
 	    	var image_data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
@@ -200,7 +77,7 @@ $(document).ready(function() {
 	    },
 
 	    rightReflect: function() {
-	    	var img = this.person.album_profile[this.avatar_index];
+	    	var img = this.album.photos[this.avatar_index];
 
 	    	this.context.drawImage(img, 0, 0, img.width, img.height);
 	    	var image_data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
@@ -216,6 +93,203 @@ $(document).ready(function() {
 	    	}
 	    	this.context.putImageData(image_data, 0, 0);
 	    }	
+	}
+
+	/*PERSON*/
+	/////////////////////////////////////////////////////////////////////////////////////////
+
+	function Person(friend) {
+		this.uid = friend.uid;
+		this.first_name = friend.first_name;
+		this.last_name = friend.last_name;
+		this.avatar = friend.photo_50;
+		this.albums = [];
+	}
+
+	Person.prototype.addToList = function() {
+		$("#friend_list").append("<div class='person' id='" + this.uid + "'><div class='avatar_small'></div><div class='person_name'>" + this.first_name + " " + this.last_name + "</div></div>");
+		$("#" + this.uid).children('.avatar_small').css("backgroundImage", "url(" + this.avatar + ")");
+	}
+
+	Person.prototype.pick = function() {
+		canvas.user = this;
+		canvas.avatar_index = 0;
+		
+		$("#picked").html("<div id='picked_person'><div class='avatar_small'></div><div class='person_name'>" + this.first_name + " " + this.last_name + "</div></div>");
+		$("#picked_person").children('.avatar_small').css("backgroundImage", "url(" + this.avatar + ")");
+		if(!this.albums.length) {
+			postRequest('photos.getAlbums', {owner_id: this.uid, need_system: 1}, this.albumsList, this);
+		}
+		else {
+			this.albumSelector();
+		}
+	}
+
+	Person.prototype.albumsList = function(data) {
+		if(data['error']) {
+			if(data['error']['error_code'] == 15) {
+				canvas.context.clearRect(0, 0, canvas.canvas.width, canvas.canvas.height);
+				$("#album_selector").html("<option disabled>Нет альбомов</option>");
+				return;
+			}
+		}
+		for(var i = 0; i < data['response'].length; i++) {
+			if(data['response'][i].size && (data['response'][i].aid > 0 || data['response'][i].aid == -6 || data['response'][i].aid == -7))
+				this.albums.push(new Album(data['response'][i]));
+		}
+		this.albumSelector();
+	}
+
+	Person.prototype.albumSelector = function() {
+		if(!this.albums.length) {
+			canvas.context.clearRect(0, 0, canvas.canvas.width, canvas.canvas.height);
+			$("#album_selector").html("<option disabled>Нет альбомов</option>");
+		}
+		else {
+			$("#album_selector").empty();
+			for(var i = 0; i < this.albums.length; i++) {
+				$("#album_selector").append("<option value='" + i + "'>" + this.albums[i].title + " (" + this.albums[i].size + ")" + "</option>");
+			}
+			this.pickAlbum();		
+		}
+		$("#album_selector").width($("#photo_panel").width());
+		$("#album_selector").height(20);
+	}
+
+	Person.prototype.pickAlbum = function() {
+		var id = $("#album_selector").val();
+		canvas.avatar_index = 0;
+		canvas.album = this.albums[id];
+
+		if(!canvas.album.photos.length)
+			postRequest('photos.get', {owner_id: this.uid, album_id: canvas.album.id}, this.avatarList, this);
+		else
+			canvas.draw();
+	}
+
+	Person.prototype.avatarList = function(data) {
+		var album_array = [];
+		$.each(data['response'], function(i, val) {
+			album_array.unshift(val['src_big']);
+		});
+
+		/*for(var i = 0; i < data['response'].length; i+=10) {
+			album_array = [];		
+			for(var j = 0; j < 10; j++) {
+				console.log(i+j);
+				if(data['response'][i+j])
+					album_array.unshift(data['response'][i+j]['src_big']);
+			}
+
+		}*/
+
+		$.ajax({
+			url: 'img_upload.php',
+			type: 'POST',
+			data: {'images': album_array},
+			success: this.loadImages,
+			error: function(data, textStatus, errorThrown) {
+				console.log(data);
+				console.log(textStatus);
+				console.log(errorThrown);
+			},
+			dataType: 'json',
+			context: this
+		});		
+	}
+
+	Person.prototype.loadImages = function(data) {
+		var album_array = canvas.album.photos;
+		$.each(data, function(i, val) {
+			new_image = new Image();
+			new_image.src = val;
+			album_array.push(new_image);
+		});
+		this.waitForImages();
+	}
+
+	Person.prototype.waitForImages = function() {
+		var that = this;
+		var album = canvas.album.photos;
+	  	for(var i = 0; i <album.length; i++) {
+	  		if(!album[i].complete) {
+	  			setTimeout(function() { that.waitForImages(); }, 100);
+	  			return;
+	  		}
+	  		else {
+	  			if(album[i].width > 500 || album[i].height > 500) {
+	  				var k;
+	  				if(album[i].width > album[i].height) {
+	  					k = album[i].width/500;
+		        		album[i].width /= k;
+		        		album[i].height /= k;       		
+		        	}
+			    	else {
+			    		k = album[i].height/500;
+		        		album[i].width /= k;
+		        		album[i].height /= k;      		
+			    	}
+	  			}
+	  		}
+	  	}
+	  	this.clearTemp();
+	  	canvas.draw();
+	}
+
+	Person.prototype.clearTemp = function() {
+		var temp = [];
+		var array = canvas.album.photos;
+		
+		$.each(array, function(i, val) {
+			temp.push(val.src);
+		});
+
+		$.ajax({
+			url: 'clear_temp.php',
+			type: 'POST',
+			data: {'images': temp},
+			error: function(data, textStatus, errorThrown) {
+				console.log(data);
+				console.log(textStatus);
+				console.log(errorThrown);
+			}
+		});	
+	}
+
+	/*ALBUM*/
+	/////////////////////////////////////////////////////////////////////////////////////////
+
+	function Album(album) {
+		this.id = album.aid;
+		this.owner = album.owner_id;
+		this.title = album.title;
+		this.size = album.size;
+		this.photos = [];
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+
+	function prevAvatar() {
+		if(canvas.avatar_index == 0) {
+			canvas.avatar_index = canvas.album.photos.length - 1;
+			canvas.draw();
+		}
+		else {
+			canvas.avatar_index--;
+			canvas.draw();
+		}
+	}
+
+	function nextAvatar() {
+		if(canvas.avatar_index == canvas.album.photos.length - 1) {
+			canvas.avatar_index = 0;
+			canvas.draw();
+		}
+		else {
+			canvas.avatar_index++;
+			canvas.draw();
+		}
 	}
 
 	function postRequest(method, data, callback, context) {
@@ -242,9 +316,12 @@ $(document).ready(function() {
 			$("#friend_list").toggle();
 		});
 
+		$("#album_selector").change(function() { canvas.user.pickAlbum(); });
+
 		$("#prev_av").click(prevAvatar);
   		$("#next_av").click(nextAvatar);
 
+  		$("#or_original").click(function() { canvas.draw(); });
   		$("#or_left").click(function() { canvas.leftReflect(); });
   		$("#or_right").click(function() { canvas.rightReflect(); });
 	}

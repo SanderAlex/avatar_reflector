@@ -1,10 +1,13 @@
 html, body {
-	width: 600px;
+	width: 1000px;
 	height: 500px;
 	font-family: sans-serif;
+	margin: 0;
+	padding: 0;
 }
 
 #main_container {
+	padding: 10px;
 }
 	.avatar_small {
 		height: 50px;
@@ -62,46 +65,89 @@ html, body {
     				overflow: hidden; /* Обрезаем все, что не помещается в область */
     			}
 
-    	#controller {
+    	#photo_panel {
     		float: left;
-    		width: 180px;
-    		height: 35px;
+    		width: 280px;
+    		height: 70px;
+    		margin-left: 10px;
     	}
-    		.control {
-    			height: 100%;
-    			float: left;
-    		}
-    		.arrow {
-    			width: 40px;
-    			background-color: #F1F1F1;
-    		}
-    		.arrow:hover {
-    			cursor: pointer;
-    			background-color: #E1E1E1;
-    		}
-    		#count_av {
-    			width: 100px;
-    			margin-top: 10px;
-    			text-align: center;
-    			font-weight: bold;
-    		}
 
-    	#orientation_switcher {
-    		float: left;
-    		width: 120px;
-    		height: 50px;
-    	}
-    		.or_sw {
-    			float: left;
-    			width: 50%;
-    			height: 100%;
-    			background-color: #F1F1F1;
-    		}
-    		.or_sw:hover {
-    			cursor: pointer;
-    			background-color: #E1E1E1;
-    		}
+	    	#controller {
+	    		float: left;
+	    		width: 180px;
+	    		height: 35px;
+	    		margin: 15px 0 0 60px;
+	    	}
+	    		.control {
+	    			height: 100%;
+	    			float: left;
+	    		}
+	    		.arrow {
+	    			width: 40px;
+	    			background-color: #F1F1F1;
+	    		}
+	    		.arrow:hover {
+	    			cursor: pointer;
+	    			background-color: #E1E1E1;
+	    		}
+	    		#count_av {
+	    			width: 100px;
+	    			margin-top: 10px;
+	    			text-align: center;
+	    			font-weight: bold;
+	    		}
+
+	    #reflect_control {
+	    	float: left;
+	    	width: 280px;
+	    	height: 70px;
+	    	margin-left: 10px;
+	    }
+
+	    	#orientation_switcher {
+	    		float: left;
+	    		width: 100%;
+	    		height: 70px;
+	    	}
+	    	#orientation_switcher div {
+	    		text-align: center;
+	    		padding-top: 10px;
+	    	}	
+	    		.ref_meth {
+	    			float: left;
+	    			width: 49%;
+	    			height: 24px;
+	    			background-color: #F1F1F1;
+	    		}
+	    		.ref_meth:not(#ref_center) {
+	    			margin-left: 2%;
+	    		}
+	    		.ref_meth:hover {
+	    			cursor: pointer;
+	    			background-color: #E1E1E1;
+	    		}
+	    		.or_sw {
+	    			float: left;
+	    			width: 32%;
+	    			height: 24px;
+	    			margin-top: 3px;
+	    			background-color: #F1F1F1;
+	    		}
+	    		.or_sw:not(#or_original) {
+	    			margin-left: 2%;
+	    		}
+	    		.or_sw:hover {
+	    			cursor: pointer;
+	    			background-color: #E1E1E1;
+	    		}
     
     .clear_both {
     	clear: both;
     }
+
+    #canvas_div {
+    	margin-top: 5px;
+    }
+    	.canvas {
+    		position: absolute;
+    	}
