@@ -45,6 +45,7 @@ html, body {
 			padding: 0 10px 0 10px;
 			overflow-y: scroll;
 			background-color: #F1F1F1;
+			z-index: 2;
 		}	
 			.person {
 				width: 100%;
@@ -113,6 +114,10 @@ html, body {
 	    		text-align: center;
 	    		padding-top: 10px;
 	    	}	
+	    		.button:hover {
+	    			cursor: pointer;
+	    			background-color: #E1E1E1;
+	    		}
 	    		.ref_meth {
 	    			float: left;
 	    			width: 49%;
@@ -122,8 +127,7 @@ html, body {
 	    		.ref_meth:not(#ref_center) {
 	    			margin-left: 2%;
 	    		}
-	    		.ref_meth:hover {
-	    			cursor: pointer;
+	    		#ref_center {
 	    			background-color: #E1E1E1;
 	    		}
 	    		.or_sw {
@@ -140,6 +144,9 @@ html, body {
 	    			cursor: pointer;
 	    			background-color: #E1E1E1;
 	    		}
+	    		#or_original {
+	    			background-color: #E1E1E1;
+	    		}
     
     .clear_both {
     	clear: both;
@@ -149,5 +156,6 @@ html, body {
     	margin-top: 5px;
     }
     	.canvas {
+    		z-index: 1;
     		position: absolute;
     	}

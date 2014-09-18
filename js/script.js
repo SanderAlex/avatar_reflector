@@ -41,57 +41,137 @@ $(document).ready(function() {
 	        this.axis_canvas = document.getElementById("axis");
 	        this.axis_context = this.axis_canvas.getContext("2d");
 	        this.album = [];
+
+	        this.ref_method = 0;
+	        this.orientation = 0;
 	    },
 
 	    draw: function() {
 	    	var that = this;
 	    	var img = this.album.photos[this.avatar_index];
-	    	
+
 	    	this.canvas.width = img.width;
 	    	this.canvas.height = img.height;
 	    	this.axis_canvas.width = this.canvas.width;
 	    	this.axis_canvas.height = this.canvas.height;
+	    	this.offset = $("#canvas_div").width()/2 - this.canvas.width/2;
+	    	this.axis_pos = this.canvas.width/2;
+
+	    	$(this.canvas).css("margin-left", this.offset + 'px');
+	    	$(this.axis_canvas).css("margin-left", this.offset + 'px');
 
 	    	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	    	this.context.drawImage(img, 0, 0, img.width, img.height);
 
+	    	if(this.ref_method == 1)
+	    		this.orientation = 0;
+
+    		if(this.orientation == 1)
+    			this.leftReflect();
+    		else if (this.orientation == 2)
+    			this.rightReflect();
+
 	    	$("#count_av").text(that.avatar_index+1 + ' / ' + that.album.photos.length);
+	    	console.log(this.orientation);
+	    },
+
+	    center: function() {
+	    	this.ref_method = 0;
+	    	$("#axis").unbind('mousemove');
+	    	$("#axis").unbind('mouseout');
+	    	$("#axis").unbind('click');
+	    	$(".or_sw").bind('click', function() {
+  				$(".or_sw").css("background-color", "#F1F1F1");
+  				$(this).css("background-color", "#E1E1E1");
+  			});
+			$("#or_left").bind('click', function() { canvas.leftReflect(); });
+  			$("#or_right").bind('click', function() { canvas.rightReflect(); });
+
+  			this.draw();
+	    },
+
+	    custom: function() {
+	    	this.ref_method = 1;
+	    	this.orientation = 0;
+	    	this.axis_pos = null;
+	    	
+	    	this.draw();
+
+  			$(".or_sw").css("background-color", "#F1F1F1");
+  			$("#or_original").css("background-color", "#E1E1E1");
+	    	this.draw();
+	    	$("#axis").bind('mousemove', function(e) { canvas.moveAxis(e); });
+  			$("#axis").bind('mouseout', function() { 
+  				canvas.axis_context.clearRect(0, 0, canvas.axis_canvas.width, canvas.axis_canvas.height);
+  			});
+  			$("#axis").bind('click', function(e) { canvas.axisPosition(e); });
+	    },
+
+	    moveAxis: function(e) {
+	    	this.axis_context.clearRect(0, 0, this.axis_canvas.width, this.axis_canvas.height);
+	    	this.axis_context.beginPath();
+	    	this.axis_context.moveTo(e.pageX - this.offset - 10, 0);
+	    	this.axis_context.lineTo(e.pageX - this.offset - 10, this.axis_canvas.height);
+	    	this.axis_context.stroke();
+	    },
+
+	    axisPosition: function(e) {
+	    	this.axis_pos = e.pageX - this.offset - 10;
+	    	this.orientation = 1;
+	    	this.leftReflect();
 	    },
 
 	    leftReflect: function() {
+	    	if(this.axisPosition == null)
+	    		alert("Установите ось");
+	    	this.orientation = 1;
 	    	var img = this.album.photos[this.avatar_index];
 
 	    	this.context.drawImage(img, 0, 0, img.width, img.height);
-	    	var image_data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+	    	var image_data = this.context.getImageData(0, 0, this.axis_pos, this.canvas.height);
+	    	var new_image_data = this.context.createImageData(image_data.width, this.canvas.height);
 
 	    	for(var i = 0; i < image_data.height; i++) {
 	  			c_pix = i*image_data.width*4;
-	    		for(var j = c_pix; j < image_data.width/2*4 + c_pix; j += 4) {
-	    			image_data.data[c_pix+image_data.width*4-j+c_pix] = image_data.data[j];
-					image_data.data[c_pix+image_data.width*4-j+c_pix+1] = image_data.data[j+1];
-					image_data.data[c_pix+image_data.width*4-j+c_pix+2] = image_data.data[j+2];
-					image_data.data[c_pix+image_data.width*4-j+c_pix+3] = image_data.data[j+3];					
+	    		for(var j = 0; j < image_data.width*4; j += 4) {
+	    			new_image_data.data[c_pix+j] = image_data.data[c_pix+image_data.width*4-j-4];
+	    			new_image_data.data[c_pix+j+1] = image_data.data[c_pix+image_data.width*4-j-3];
+	    			new_image_data.data[c_pix+j+2] = image_data.data[c_pix+image_data.width*4-j-2];
+	    			new_image_data.data[c_pix+j+3] = image_data.data[c_pix+image_data.width*4-j-1];		
 	    		}
 	    	}
-    		this.context.putImageData(image_data, 0, 0);
+
+	    	this.canvas.width = image_data.width*2;
+	    	this.context.putImageData(image_data, 0, 0);
+	    	this.context.putImageData(new_image_data, this.axis_pos, 0);
 	    },
 
 	    rightReflect: function() {
+	    	if(this.axisPosition == null)
+	    		alert("Установите ось");
+	    	this.orientation = 1;
 	    	var img = this.album.photos[this.avatar_index];
 
 	    	this.context.drawImage(img, 0, 0, img.width, img.height);
-	    	var image_data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+	    	var image_data = this.context.getImageData(this.axis_pos, 0, this.canvas.width - this.axis_pos, this.canvas.height);
+	    	var new_image_data = this.context.createImageData(image_data.width, this.canvas.height);
 
 	    	for(var i = 0; i < image_data.height; i++) {
 	  			c_pix = i*image_data.width*4;
-	    		for(var j = c_pix; j < image_data.width/2*4 + c_pix; j += 4) {
-	    			image_data.data[j] = image_data.data[c_pix+image_data.width*4-j+c_pix];
-					image_data.data[j+1] = image_data.data[c_pix+image_data.width*4-j+c_pix+1];
-					image_data.data[j+2] = image_data.data[c_pix+image_data.width*4-j+c_pix+2];
-					image_data.data[j+3] = image_data.data[c_pix+image_data.width*4-j+c_pix+3];
+	    		for(var j = 0; j < image_data.width*4; j += 4) {
+	    			new_image_data.data[c_pix+j] = image_data.data[c_pix+image_data.width*4-j-4];
+	    			new_image_data.data[c_pix+j+1] = image_data.data[c_pix+image_data.width*4-j-3];
+	    			new_image_data.data[c_pix+j+2] = image_data.data[c_pix+image_data.width*4-j-2];
+	    			new_image_data.data[c_pix+j+3] = image_data.data[c_pix+image_data.width*4-j-1];		
 	    		}
 	    	}
-	    	this.context.putImageData(image_data, 0, 0);
+
+	    	console.log(image_data);
+	    	console.log(new_image_data);
+
+	    	this.canvas.width = image_data.width*2;
+	    	this.context.putImageData(new_image_data, 0, 0);
+	    	this.context.putImageData(image_data, this.axis_pos, 0);
 	    }	
 	}
 
@@ -321,9 +401,27 @@ $(document).ready(function() {
 		$("#prev_av").click(prevAvatar);
   		$("#next_av").click(nextAvatar);
 
-  		$("#or_original").click(function() { canvas.draw(); });
-  		$("#or_left").click(function() { canvas.leftReflect(); });
-  		$("#or_right").click(function() { canvas.rightReflect(); });
+		$("#ref_center").click(function() { 
+			$(".ref_meth").css("background-color", "#F1F1F1");
+			$(this).css("background-color", "#E1E1E1");
+			canvas.center(); 
+		});
+  		$("#ref_custom").click(function() { 
+  			$(".ref_meth").css("background-color", "#F1F1F1");
+  			$(this).css("background-color", "#E1E1E1");
+  			canvas.custom(); 
+  		});
+
+  		$(".or_sw").bind('click', function() {
+  			$(".or_sw").css("background-color", "#F1F1F1");
+  			$(this).css("background-color", "#E1E1E1");
+  		});
+  		$("#or_original").click(function() { 
+  			canvas.orientation = 0;
+  			canvas.draw(); 
+  		});
+  		$("#or_left").bind('click', function() { canvas.leftReflect(); });
+  		$("#or_right").bind('click', function() { canvas.rightReflect(); });
 	}
 
 	VK.init(function() { 
