@@ -6,11 +6,12 @@
 	    <link rel="stylesheet" type="text/css" href="css/styles.css">
 
 	    <script type="text/javascript" src="js/jquery-2.1.1.js"></script>
+	    <script src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/jquery-ui.min.js"></script>
 		<script src="//vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
 	    <script type="text/javascript" src="js/script.js"></script>
 	</head>
 
-	<body>
+	<body draggable='false'>
 		<div id="main_container">
 			<div id="top_panel">
 				<div id="picked">
@@ -30,12 +31,12 @@
 
 				<div id="reflect_control">
 					<div id='orientation_switcher'>
-						<div class='ref_meth button' id="ref_center">center</div>
-						<div class='ref_meth button' id="ref_custom">custom</div>
-
 						<div class='or_sw button' id="or_original">original</div>
 						<div class='or_sw button' id="or_left">left</div>
 						<div class='or_sw button' id="or_right">right</div>
+					</div>
+					<div id='axis_control'>
+						<div id='axis_range'></div>
 					</div>
 				</div>
 			</div>
@@ -46,7 +47,6 @@
 			
 			<div id="canvas_div">
 				<canvas class='canvas' id='canvas' width="500" height="500"></canvas>
-				<canvas class='canvas' id='axis' width="500" height="500"></canvas>
 			</div>
 
 		</div>
